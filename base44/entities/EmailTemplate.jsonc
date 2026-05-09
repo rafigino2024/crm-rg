@@ -1,0 +1,37 @@
+{
+  "name": "EmailTemplate",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Template name"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "New",
+        "Contacted",
+        "Qualified",
+        "Proposal",
+        "Won",
+        "Lost",
+        "Any"
+      ],
+      "default": "Any",
+      "description": "Pipeline stage this template is intended for"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Email subject line"
+    },
+    "body": {
+      "type": "string",
+      "description": "Email body (supports {{name}} and {{company}} placeholders)"
+    }
+  },
+  "required": [
+    "name",
+    "subject",
+    "body"
+  ]
+}
