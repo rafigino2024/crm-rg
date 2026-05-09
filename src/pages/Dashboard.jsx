@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Plus, LayoutGrid, List, Zap } from "lucide-react";
 import PipelineBoard from "../components/pipeline/PipelineBoard";
+import StageChart from "../components/pipeline/StageChart";
 import LeadListView from "../components/pipeline/LeadListView";
 import LeadFormDialog from "../components/pipeline/LeadFormDialog";
 
@@ -120,6 +121,9 @@ export default function Dashboard() {
 
       {/* Content */}
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {!isLoading && <StageChart leads={leads} />}
+
+        <div className="mt-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-24">
             <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
@@ -133,6 +137,7 @@ export default function Dashboard() {
         ) : (
           <LeadListView leads={leads} onLeadClick={handleLeadClick} />
         )}
+        </div>
       </main>
 
       {/* Form Dialog */}
