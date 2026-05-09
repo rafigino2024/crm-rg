@@ -20,6 +20,8 @@ import {
 import TagEditor from "./TagEditor";
 import { base44 } from "@/api/base44Client";
 import SendEmailDialog from "./SendEmailDialog";
+import ActivityHistory from "./ActivityHistory";
+import { Separator } from "@/components/ui/separator";
 
 const STAGES = ["New", "Contacted", "Qualified", "Proposal", "Won", "Lost"];
 
@@ -185,6 +187,14 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                 onChange={(e) => handleChange("notes", e.target.value)}
               />
             </div>
+
+          {lead && (
+            <div className="space-y-1.5">
+              <Separator />
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide pt-1">Activity History</p>
+              <ActivityHistory leadId={lead.id} />
+            </div>
+          )}
 
             <DialogFooter className="flex items-center gap-2 pt-2">
               {lead && (

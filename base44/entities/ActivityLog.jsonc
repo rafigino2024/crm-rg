@@ -1,0 +1,37 @@
+{
+  "name": "ActivityLog",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "description": "ID of the lead this activity belongs to"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "stage_changed",
+        "notes_updated",
+        "lead_created",
+        "field_updated"
+      ],
+      "description": "Type of activity"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the activity"
+    },
+    "old_value": {
+      "type": "string",
+      "description": "Previous value (for changes)"
+    },
+    "new_value": {
+      "type": "string",
+      "description": "New value (for changes)"
+    }
+  },
+  "required": [
+    "lead_id",
+    "type",
+    "description"
+  ]
+}
