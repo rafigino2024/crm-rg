@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Send } from "lucide-react";
+import { Send, FileUp, X } from "lucide-react";
 import { toast } from "sonner";
 
 function applyPlaceholders(text, lead) {
@@ -32,6 +32,8 @@ export default function SendEmailDialog({ open, onOpenChange, lead }) {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
+  const [attachments, setAttachments] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
   const { data: templates = [] } = useQuery({
     queryKey: ["email-templates"],
@@ -58,10 +60,17 @@ export default function SendEmailDialog({ open, onOpenChange, lead }) {
       return;
     }
     setSending(true);
+    let bodyWithAttachments = body.replace(/\n/g, "<br/>");
+    if (attachments.length > 0) {
+      bodyWithAttachments += `<br/><br/><strong>Attachments:</strong><br/>`;
+      attachments.forEach((att) => {
+        bodyWithAttachments += `<a href="${att.url}">${att.name}</a><br/>`;
+      });
+    }
     await base44.integrations.Core.SendEmail({
       to: lead.email,
       subject,
-      body: body.replace(/\n/g, "<br/>"),
+      body: bodyWithAttachments,
     });
     toast.success(`Email sent to ${lead.email}`);
     setSending(false);
@@ -69,6 +78,30 @@ export default function SendEmailDialog({ open, onOpenChange, lead }) {
     setSelectedTemplateId("");
     setSubject("");
     setBody("");
+    setAttachments([]);
+  };
+
+  const handleFileSelect = async (e) => {
+    const files = Array.from(e.target.files || []);
+    setUploading(true);
+    try {
+      const uploaded = await Promise.all(
+        files.map(async (file) => {
+          const result = await base44.integrations.Core.UploadFile({ file });
+          return { name: file.name, url: result.file_url };
+        })
+      );
+      setAttachments((prev) => [...prev, ...uploaded]);
+      toast.success(`${uploaded.length} file(s) uploaded`);
+    } catch (err) {
+      toast.error("Failed to upload file(s)");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeAttachment = (index) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleClose = (val) => {
@@ -76,6 +109,7 @@ export default function SendEmailDialog({ open, onOpenChange, lead }) {
       setSelectedTemplateId("");
       setSubject("");
       setBody("");
+      setAttachments([]);
     }
     onOpenChange(val);
   };
@@ -124,6 +158,49 @@ export default function SendEmailDialog({ open, onOpenChange, lead }) {
               onChange={(e) => setBody(e.target.value)}
               rows={7}
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Attachments</Label>
+            <div className="relative">
+              <input
+                type="file"
+                multiple
+                onChange={handleFileSelect}
+                disabled={uploading}
+                className="hidden"
+                id="file-input"
+              />
+              <label htmlFor="file-input">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 cursor-pointer w-full"
+                  disabled={uploading}
+                  asChild
+                >
+                  <span>
+                    <FileUp className="w-4 h-4" />
+                    {uploading ? "Uploading..." : "Add Files"}
+                  </span>
+                </Button>
+              </label>
+            </div>
+            {attachments.length > 0 && (
+              <div className="space-y-1.5 bg-muted/40 rounded-lg p-2.5">
+                {attachments.map((att, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-sm bg-background px-2.5 py-1.5 rounded">
+                    <span className="truncate text-muted-foreground">{att.name}</span>
+                    <button
+                      onClick={() => removeAttachment(idx)}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="flex justify-end gap-2 pt-1">
             <Button variant="outline" onClick={() => handleClose(false)}>Cancel</Button>
