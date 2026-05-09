@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutGrid, List, Zap, Search, Download, UserCircle, Mail, Activity, ArrowUpDown } from "lucide-react";
+import { Plus, LayoutGrid, List, Zap, Search, Download, Upload, UserCircle, Mail, Activity, ArrowUpDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Select,
@@ -21,6 +21,7 @@ import FollowUpToday from "../components/pipeline/FollowUpToday";
 import TagFilter from "../components/pipeline/TagFilter";
 import BulkActionsBar from "../components/pipeline/BulkActionsBar";
 import PipelineValueSummary from "../components/pipeline/PipelineValueSummary";
+import BulkImportCSV from "../components/pipeline/BulkImportCSV";
 
 export default function Dashboard() {
   const PRIORITY_ORDER = { High: 0, Medium: 1, Low: 2 };
@@ -31,6 +32,7 @@ export default function Dashboard() {
   const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editingLead, setEditingLead] = useState(null);
   const queryClient = useQueryClient();
 
@@ -266,6 +268,10 @@ export default function Dashboard() {
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">Export CSV</span>
               </Button>
+              <Button onClick={() => setImportOpen(true)} size="sm" variant="outline" className="gap-1.5 rounded-lg">
+                <Upload className="w-4 h-4" />
+                <span className="hidden sm:inline">Import CSV</span>
+              </Button>
               <Button onClick={openAddDialog} size="sm" className="gap-1.5 rounded-lg">
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Add Lead</span>
@@ -355,6 +361,13 @@ export default function Dashboard() {
         lead={editingLead}
         onSave={handleSave}
         onDelete={handleDelete}
+      />
+
+      {/* Bulk Import Dialog */}
+      <BulkImportCSV
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onImportSuccess={() => queryClient.invalidateQueries({ queryKey: ["leads"] })}
       />
     </div>
   );
