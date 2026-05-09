@@ -2,7 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutGrid, List, Zap, Search, Download, UserCircle, Mail } from "lucide-react";
+import { Plus, LayoutGrid, List, Zap, Search, Download, UserCircle, Mail, Activity } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Select,
@@ -202,6 +202,12 @@ export default function Dashboard() {
                 </button>
               </div>
 
+              <Link to="/activity">
+                <Button size="sm" variant="outline" className="gap-1.5 rounded-lg">
+                  <Activity className="w-4 h-4" />
+                  <span className="hidden sm:inline">Activity</span>
+                </Button>
+              </Link>
               <Link to="/email-templates">
                 <Button size="sm" variant="outline" className="gap-1.5 rounded-lg">
                   <Mail className="w-4 h-4" />
