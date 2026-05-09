@@ -1,5 +1,6 @@
 import { Building2, Mail, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { getTagColor } from "./tagConfig";
 
 const stageColors = {
   New: "bg-blue-50 text-blue-700 border-blue-200",
@@ -45,6 +46,19 @@ export default function LeadCard({ lead, onClick, dragHandleProps }) {
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Phone className="w-3 h-3 shrink-0" />
           <span className="truncate">{lead.phone}</span>
+        </div>
+      )}
+
+      {lead.tags?.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2.5">
+          {lead.tags.map((tag) => (
+            <span
+              key={tag}
+              className={`text-[10px] px-1.5 py-0.5 rounded-full border font-medium ${getTagColor(tag)}`}
+            >
+              {tag}
+            </span>
+          ))}
         </div>
       )}
 

@@ -31,6 +31,13 @@
       "default": "New",
       "description": "Current pipeline stage"
     },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Custom labels for the lead"
+    },
     "notes": {
       "type": "string",
       "description": "Additional notes about the lead"

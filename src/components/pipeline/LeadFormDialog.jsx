@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import TagEditor from "./TagEditor";
 
 const STAGES = ["New", "Contacted", "Qualified", "Proposal", "Won", "Lost"];
 
@@ -26,6 +27,7 @@ const emptyLead = {
   email: "",
   phone: "",
   stage: "New",
+  tags: [],
   notes: "",
 };
 
@@ -124,6 +126,14 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                 onChange={(e) => handleChange("phone", e.target.value)}
               />
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Tags</Label>
+            <TagEditor
+              tags={form.tags || []}
+              onChange={(tags) => handleChange("tags", tags)}
+            />
           </div>
 
           <div className="space-y-1.5">
