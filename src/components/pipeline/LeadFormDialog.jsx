@@ -36,6 +36,7 @@ const emptyLead = {
   tags: [],
   follow_up_date: "",
   notes: "",
+  internal_notes: "",
 };
 
 export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDelete }) {
@@ -200,6 +201,17 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                 className="h-20 resize-none"
                 value={form.notes}
                 onChange={(e) => handleChange("notes", e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="internal_notes">Internal Notes</Label>
+              <Textarea
+                id="internal_notes"
+                placeholder="Track call details, follow-ups, and internal observations..."
+                className="h-20 resize-none"
+                value={form.internal_notes || ""}
+                onChange={(e) => handleChange("internal_notes", e.target.value)}
               />
             </div>
 

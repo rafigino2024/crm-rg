@@ -60,6 +60,10 @@
     "notes": {
       "type": "string",
       "description": "Additional notes about the lead"
+    },
+    "internal_notes": {
+      "type": "string",
+      "description": "Internal call notes and details"
     }
   },
   "required": [
