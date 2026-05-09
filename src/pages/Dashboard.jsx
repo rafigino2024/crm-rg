@@ -2,7 +2,8 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutGrid, List, Zap } from "lucide-react";
+import { Plus, LayoutGrid, List, Zap, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import PipelineBoard from "../components/pipeline/PipelineBoard";
 import StageChart from "../components/pipeline/StageChart";
 import LeadListView from "../components/pipeline/LeadListView";
@@ -10,6 +11,7 @@ import LeadFormDialog from "../components/pipeline/LeadFormDialog";
 
 export default function Dashboard() {
   const [view, setView] = useState("board");
+  const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingLead, setEditingLead] = useState(null);
   const queryClient = useQueryClient();
@@ -66,6 +68,14 @@ export default function Dashboard() {
     setDialogOpen(true);
   };
 
+  const filteredLeads = search.trim()
+    ? leads.filter(
+        (l) =>
+          l.name?.toLowerCase().includes(search.toLowerCase()) ||
+          l.company?.toLowerCase().includes(search.toLowerCase())
+      )
+    : leads;
+
   const totalLeads = leads.length;
   const activeLeads = leads.filter(
     (l) => !["Won", "Lost"].includes(l.stage)
@@ -90,6 +100,15 @@ export default function Dashboard() {
             </div>
 
             <div className="flex items-center gap-2">
+              <div className="relative hidden sm:block">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or company..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-8 h-8 w-56 text-sm rounded-lg"
+                />
+              </div>
               {/* View Toggle */}
               <div className="hidden sm:flex items-center bg-muted rounded-lg p-0.5">
                 <button
@@ -123,6 +142,17 @@ export default function Dashboard() {
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {!isLoading && <StageChart leads={leads} />}
 
+        {/* Mobile search */}
+        <div className="sm:hidden mt-4 relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Search by name or company..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8 text-sm rounded-lg"
+          />
+        </div>
+
         <div className="mt-6">
         {isLoading ? (
           <div className="flex items-center justify-center py-24">
@@ -130,12 +160,12 @@ export default function Dashboard() {
           </div>
         ) : view === "board" ? (
           <PipelineBoard
-            leads={leads}
+            leads={filteredLeads}
             onDragEnd={handleDragEnd}
             onLeadClick={handleLeadClick}
           />
         ) : (
-          <LeadListView leads={leads} onLeadClick={handleLeadClick} />
+          <LeadListView leads={filteredLeads} onLeadClick={handleLeadClick} />
         )}
         </div>
       </main>
