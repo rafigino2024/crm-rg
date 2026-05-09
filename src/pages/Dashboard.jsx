@@ -9,10 +9,12 @@ import StageChart from "../components/pipeline/StageChart";
 import LeadListView from "../components/pipeline/LeadListView";
 import LeadFormDialog from "../components/pipeline/LeadFormDialog";
 import FollowUpToday from "../components/pipeline/FollowUpToday";
+import TagFilter from "../components/pipeline/TagFilter";
 
 export default function Dashboard() {
   const [view, setView] = useState("board");
   const [search, setSearch] = useState("");
+  const [selectedTags, setSelectedTags] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingLead, setEditingLead] = useState(null);
   const queryClient = useQueryClient();
@@ -69,13 +71,16 @@ export default function Dashboard() {
     setDialogOpen(true);
   };
 
-  const filteredLeads = search.trim()
-    ? leads.filter(
-        (l) =>
-          l.name?.toLowerCase().includes(search.toLowerCase()) ||
-          l.company?.toLowerCase().includes(search.toLowerCase())
-      )
-    : leads;
+  const filteredLeads = leads.filter((l) => {
+    const matchesSearch =
+      !search.trim() ||
+      l.name?.toLowerCase().includes(search.toLowerCase()) ||
+      l.company?.toLowerCase().includes(search.toLowerCase());
+    const matchesTags =
+      selectedTags.length === 0 ||
+      selectedTags.every((t) => l.tags?.includes(t));
+    return matchesSearch && matchesTags;
+  });
 
   const totalLeads = leads.length;
   const activeLeads = leads.filter(
@@ -154,6 +159,12 @@ export default function Dashboard() {
             className="pl-8 text-sm rounded-lg"
           />
         </div>
+
+        {!isLoading && leads.length > 0 && (
+          <div className="mt-4">
+            <TagFilter leads={leads} selectedTags={selectedTags} onChange={setSelectedTags} />
+          </div>
+        )}
 
         <div className="mt-6">
         {isLoading ? (
