@@ -62,6 +62,11 @@
       "format": "date",
       "description": "Date when the lead should be followed up"
     },
+    "next_action_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the next action or follow-up task"
+    },
     "notes": {
       "type": "string",
       "description": "Additional notes about the lead"

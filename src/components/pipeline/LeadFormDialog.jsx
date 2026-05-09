@@ -37,6 +37,7 @@ const emptyLead = {
   assigned_to: "",
   tags: [],
   follow_up_date: "",
+  next_action_date: "",
   notes: "",
   internal_notes: "",
 };
@@ -195,15 +196,27 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
               </MobileSelect>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="follow_up_date">Follow-up Date</Label>
-              <Input
-                id="follow_up_date"
-                type="date"
-                value={form.follow_up_date || ""}
-                onChange={(e) => handleChange("follow_up_date", e.target.value)}
-                className="h-9"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="follow_up_date">Follow-up Date</Label>
+                <Input
+                  id="follow_up_date"
+                  type="date"
+                  value={form.follow_up_date || ""}
+                  onChange={(e) => handleChange("follow_up_date", e.target.value)}
+                  className="h-9"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="next_action_date">Next Action Date</Label>
+                <Input
+                  id="next_action_date"
+                  type="date"
+                  value={form.next_action_date || ""}
+                  onChange={(e) => handleChange("next_action_date", e.target.value)}
+                  className="h-9"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">
