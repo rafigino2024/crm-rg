@@ -23,7 +23,7 @@ import SendEmailDialog from "./SendEmailDialog";
 import ActivityHistory from "./ActivityHistory";
 import { Separator } from "@/components/ui/separator";
 
-const STAGES = ["New", "Contacted", "Qualified", "Proposal", "Won", "Lost"];
+const STAGES = ["New", "Contacted", "Qualified", "Negotiation", "Proposal", "Won", "Lost"];
 
 const emptyLead = {
   name: "",
@@ -32,6 +32,7 @@ const emptyLead = {
   phone: "",
   stage: "New",
   priority: "Medium",
+  estimated_value: "",
   assigned_to: "",
   tags: [],
   follow_up_date: "",
@@ -155,6 +156,19 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                   onChange={(e) => handleChange("phone", e.target.value)}
                 />
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="estimated_value">Estimated Value</Label>
+              <Input
+                id="estimated_value"
+                type="number"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                value={form.estimated_value || ""}
+                onChange={(e) => handleChange("estimated_value", e.target.value ? parseFloat(e.target.value) : "")}
+              />
             </div>
 
             <div className="space-y-1.5">

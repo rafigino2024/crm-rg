@@ -24,6 +24,7 @@
         "New",
         "Contacted",
         "Qualified",
+        "Negotiation",
         "Proposal",
         "Won",
         "Lost"
@@ -40,6 +41,10 @@
       ],
       "default": "Medium",
       "description": "Priority level of the lead"
+    },
+    "estimated_value": {
+      "type": "number",
+      "description": "Estimated deal value in currency units"
     },
     "assigned_to": {
       "type": "string",

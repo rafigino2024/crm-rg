@@ -20,6 +20,7 @@ import LeadFormDialog from "../components/pipeline/LeadFormDialog";
 import FollowUpToday from "../components/pipeline/FollowUpToday";
 import TagFilter from "../components/pipeline/TagFilter";
 import BulkActionsBar from "../components/pipeline/BulkActionsBar";
+import PipelineValueSummary from "../components/pipeline/PipelineValueSummary";
 
 export default function Dashboard() {
   const PRIORITY_ORDER = { High: 0, Medium: 1, Low: 2 };
@@ -276,6 +277,7 @@ export default function Dashboard() {
 
       {/* Content */}
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {!isLoading && <PipelineValueSummary leads={leads} />}
         {!isLoading && <StageChart leads={leads} />}
         {!isLoading && <div className="mt-4"><FollowUpToday leads={leads} onLeadClick={handleLeadClick} /></div>}
 
