@@ -10,6 +10,12 @@ import {
 } from "@/components/ui/table";
 import { Building2, Mail, Phone, UserCircle } from "lucide-react";
 
+const priorityColors = {
+  High: "bg-red-50 text-red-600 border-red-200",
+  Medium: "bg-amber-50 text-amber-600 border-amber-200",
+  Low: "bg-slate-50 text-slate-500 border-slate-200",
+};
+
 const stageColors = {
   New: "bg-blue-50 text-blue-700 border-blue-200",
   Contacted: "bg-amber-50 text-amber-700 border-amber-200",
@@ -36,6 +42,7 @@ export default function LeadListView({ leads, onLeadClick, selectedIds, onSelect
             <TableHead className="font-semibold">Name</TableHead>
             <TableHead className="font-semibold">Company</TableHead>
             <TableHead className="font-semibold">Contact</TableHead>
+            <TableHead className="font-semibold">Priority</TableHead>
             <TableHead className="font-semibold">Stage</TableHead>
             <TableHead className="font-semibold">Assigned To</TableHead>
             <TableHead className="font-semibold">Notes</TableHead>
@@ -81,6 +88,11 @@ export default function LeadListView({ leads, onLeadClick, selectedIds, onSelect
                     </div>
                   )}
                 </div>
+              </TableCell>
+              <TableCell onClick={() => onLeadClick(lead)}>
+                <Badge variant="outline" className={`text-xs ${priorityColors[lead.priority] || priorityColors.Medium}`}>
+                  {lead.priority || "Medium"}
+                </Badge>
               </TableCell>
               <TableCell onClick={() => onLeadClick(lead)}>
                 <Badge variant="outline" className={`text-xs ${stageColors[lead.stage] || ""}`}>

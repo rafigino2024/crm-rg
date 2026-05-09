@@ -2,7 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutGrid, List, Zap, Search, Download, UserCircle, Mail, Activity } from "lucide-react";
+import { Plus, LayoutGrid, List, Zap, Search, Download, UserCircle, Mail, Activity, ArrowUpDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Select,
@@ -21,8 +21,10 @@ import TagFilter from "../components/pipeline/TagFilter";
 import BulkActionsBar from "../components/pipeline/BulkActionsBar";
 
 export default function Dashboard() {
+  const PRIORITY_ORDER = { High: 0, Medium: 1, Low: 2 };
   const [view, setView] = useState("board");
   const [search, setSearch] = useState("");
+  const [sortByPriority, setSortByPriority] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -134,7 +136,7 @@ export default function Dashboard() {
     URL.revokeObjectURL(url);
   };
 
-  const filteredLeads = leads.filter((l) => {
+  let filteredLeads = leads.filter((l) => {
     const matchesSearch =
       !search.trim() ||
       l.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -146,6 +148,12 @@ export default function Dashboard() {
       !selectedOwner || l.assigned_to === selectedOwner;
     return matchesSearch && matchesTags && matchesOwner;
   });
+
+  if (sortByPriority) {
+    filteredLeads.sort((a, b) =>
+      (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1)
+    );
+  }
 
   const owners = [...new Set(leads.map((l) => l.assigned_to).filter(Boolean))];
 
@@ -202,6 +210,15 @@ export default function Dashboard() {
                 </button>
               </div>
 
+              <Button
+                size="sm"
+                variant={sortByPriority ? "default" : "outline"}
+                className="gap-1.5 rounded-lg"
+                onClick={() => setSortByPriority((p) => !p)}
+              >
+                <ArrowUpDown className="w-4 h-4" />
+                <span className="hidden sm:inline">Priority</span>
+              </Button>
               <Link to="/activity">
                 <Button size="sm" variant="outline" className="gap-1.5 rounded-lg">
                   <Activity className="w-4 h-4" />

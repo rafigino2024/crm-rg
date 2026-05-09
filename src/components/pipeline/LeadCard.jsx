@@ -3,6 +3,12 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getTagColor } from "./tagConfig";
 
+const priorityColors = {
+  High: "bg-red-50 text-red-600 border-red-200",
+  Medium: "bg-amber-50 text-amber-600 border-amber-200",
+  Low: "bg-slate-50 text-slate-500 border-slate-200",
+};
+
 const stageColors = {
   New: "bg-blue-50 text-blue-700 border-blue-200",
   Contacted: "bg-amber-50 text-amber-700 border-amber-200",
@@ -30,9 +36,16 @@ export default function LeadCard({ lead, onClick, dragHandleProps, selected, onS
             {lead.name}
           </h3>
         </div>
-        <Badge variant="outline" className={`text-[10px] px-1.5 py-0 shrink-0 ml-2 ${stageColors[lead.stage] || ""}`}>
-          {lead.stage}
-        </Badge>
+        <div className="flex items-center gap-1 shrink-0 ml-2">
+          {lead.priority && lead.priority !== "Medium" && (
+            <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${priorityColors[lead.priority] || ""}`}>
+              {lead.priority}
+            </Badge>
+          )}
+          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${stageColors[lead.stage] || ""}`}>
+            {lead.stage}
+          </Badge>
+        </div>
       </div>
 
       {lead.company && (

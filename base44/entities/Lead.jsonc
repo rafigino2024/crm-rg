@@ -31,6 +31,16 @@
       "default": "New",
       "description": "Current pipeline stage"
     },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "default": "Medium",
+      "description": "Priority level of the lead"
+    },
     "assigned_to": {
       "type": "string",
       "description": "Email of the team member assigned to this lead"

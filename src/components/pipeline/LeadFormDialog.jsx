@@ -31,6 +31,7 @@ const emptyLead = {
   email: "",
   phone: "",
   stage: "New",
+  priority: "Medium",
   assigned_to: "",
   tags: [],
   follow_up_date: "",
@@ -117,6 +118,20 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="priority">Priority</Label>
+              <Select value={form.priority || "Medium"} onValueChange={(v) => handleChange("priority", v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="High">🔴 High</SelectItem>
+                  <SelectItem value="Medium">🟡 Medium</SelectItem>
+                  <SelectItem value="Low">⚪ Low</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
