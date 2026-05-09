@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import MobileSelect from "@/components/MobileSelect";
 import TagEditor from "./TagEditor";
 import { base44 } from "@/api/base44Client";
 import SendEmailDialog from "./SendEmailDialog";
@@ -109,31 +110,35 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="stage">Stage</Label>
-                <Select value={form.stage} onValueChange={(v) => handleChange("stage", v)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                <MobileSelect
+                  value={form.stage}
+                  onValueChange={(v) => handleChange("stage", v)}
+                  placeholder="Select stage"
+                  label="Stage"
+                >
                   <SelectContent>
                     {STAGES.map((s) => (
                       <SelectItem key={s} value={s}>{s}</SelectItem>
                     ))}
                   </SelectContent>
-                </Select>
+                </MobileSelect>
               </div>
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="priority">Priority</Label>
-              <Select value={form.priority || "Medium"} onValueChange={(v) => handleChange("priority", v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+              <MobileSelect
+                value={form.priority || "Medium"}
+                onValueChange={(v) => handleChange("priority", v)}
+                placeholder="Select priority"
+                label="Priority"
+              >
                 <SelectContent>
                   <SelectItem value="High">🔴 High</SelectItem>
                   <SelectItem value="Medium">🟡 Medium</SelectItem>
                   <SelectItem value="Low">⚪ Low</SelectItem>
                 </SelectContent>
-              </Select>
+              </MobileSelect>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -173,10 +178,12 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
 
             <div className="space-y-1.5">
               <Label htmlFor="assigned_to">Assigned To</Label>
-              <Select value={form.assigned_to || ""} onValueChange={(v) => handleChange("assigned_to", v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Unassigned" />
-                </SelectTrigger>
+              <MobileSelect
+                value={form.assigned_to || ""}
+                onValueChange={(v) => handleChange("assigned_to", v)}
+                placeholder="Unassigned"
+                label="Assigned To"
+              >
                 <SelectContent>
                   <SelectItem value={null}>Unassigned</SelectItem>
                   {users.map((u) => (
@@ -185,7 +192,7 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+              </MobileSelect>
             </div>
 
             <div className="space-y-1.5">

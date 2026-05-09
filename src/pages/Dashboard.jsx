@@ -22,6 +22,7 @@ import TagFilter from "../components/pipeline/TagFilter";
 import BulkActionsBar from "../components/pipeline/BulkActionsBar";
 import PipelineValueSummary from "../components/pipeline/PipelineValueSummary";
 import BulkImportCSV from "../components/pipeline/BulkImportCSV";
+import DashboardMobileMenu from "../components/DashboardMobileMenu";
 
 export default function Dashboard() {
   const PRIORITY_ORDER = { High: 0, Medium: 1, Low: 2 };
@@ -258,20 +259,32 @@ export default function Dashboard() {
                   <span className="hidden sm:inline">Activity</span>
                 </Button>
               </Link>
-              <Link to="/email-templates">
-                <Button size="sm" variant="outline" className="gap-1.5 rounded-lg">
-                  <Mail className="w-4 h-4" />
-                  <span className="hidden sm:inline">Templates</span>
+
+              <div className="sm:hidden">
+                <DashboardMobileMenu
+                  onExportCSV={exportCSV}
+                  onImportCSV={() => setImportOpen(true)}
+                  onEmailTemplates={() => {}}
+                />
+              </div>
+
+              <div className="hidden sm:flex items-center gap-2">
+                <Button onClick={exportCSV} size="sm" variant="outline" className="gap-1.5 rounded-lg">
+                  <Download className="w-4 h-4" />
+                  Export CSV
                 </Button>
-              </Link>
-              <Button onClick={exportCSV} size="sm" variant="outline" className="gap-1.5 rounded-lg">
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Export CSV</span>
-              </Button>
-              <Button onClick={() => setImportOpen(true)} size="sm" variant="outline" className="gap-1.5 rounded-lg">
-                <Upload className="w-4 h-4" />
-                <span className="hidden sm:inline">Import CSV</span>
-              </Button>
+                <Button onClick={() => setImportOpen(true)} size="sm" variant="outline" className="gap-1.5 rounded-lg">
+                  <Upload className="w-4 h-4" />
+                  Import CSV
+                </Button>
+                <Link to="/email-templates">
+                  <Button size="sm" variant="outline" className="gap-1.5 rounded-lg">
+                    <Mail className="w-4 h-4" />
+                    Templates
+                  </Button>
+                </Link>
+              </div>
+
               <Button onClick={openAddDialog} size="sm" className="gap-1.5 rounded-lg">
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Add Lead</span>

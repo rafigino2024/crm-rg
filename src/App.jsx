@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -64,6 +65,31 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  useEffect(() => {
+    // Check system preference for dark mode
+    const prefersColorScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    
+    const applyDarkMode = (isDark) => {
+      const html = document.documentElement;
+      if (isDark) {
+        html.classList.add("dark");
+      } else {
+        html.classList.remove("dark");
+      }
+    };
+
+    // Apply initial preference
+    applyDarkMode(prefersColorScheme.matches);
+
+    // Listen for changes in system preference
+    const mediaQueryList = prefersColorScheme.addEventListener("change", (e) => {
+      applyDarkMode(e.matches);
+    });
+
+    return () => {
+      prefersColorScheme.removeEventListener("change", mediaQueryList);
+    };
+  }, []);
 
   return (
     <AuthProvider>
