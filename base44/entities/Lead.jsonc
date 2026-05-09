@@ -1,0 +1,43 @@
+{
+  "name": "Lead",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Full name of the lead"
+    },
+    "company": {
+      "type": "string",
+      "description": "Company or organization"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email address"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "New",
+        "Contacted",
+        "Qualified",
+        "Proposal",
+        "Won",
+        "Lost"
+      ],
+      "default": "New",
+      "description": "Current pipeline stage"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes about the lead"
+    }
+  },
+  "required": [
+    "name",
+    "stage"
+  ]
+}
