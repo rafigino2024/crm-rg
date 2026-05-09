@@ -31,6 +31,10 @@
       "default": "New",
       "description": "Current pipeline stage"
     },
+    "assigned_to": {
+      "type": "string",
+      "description": "Email of the team member assigned to this lead"
+    },
     "tags": {
       "type": "array",
       "items": {

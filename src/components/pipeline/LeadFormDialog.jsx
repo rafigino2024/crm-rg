@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import TagEditor from "./TagEditor";
+import { base44 } from "@/api/base44Client";
 
 const STAGES = ["New", "Contacted", "Qualified", "Proposal", "Won", "Lost"];
 
@@ -27,6 +28,7 @@ const emptyLead = {
   email: "",
   phone: "",
   stage: "New",
+  assigned_to: "",
   tags: [],
   follow_up_date: "",
   notes: "",
@@ -35,6 +37,11 @@ const emptyLead = {
 export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDelete }) {
   const [form, setForm] = useState(emptyLead);
   const [saving, setSaving] = useState(false);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    base44.entities.User.list().then(setUsers).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -127,6 +134,23 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                 onChange={(e) => handleChange("phone", e.target.value)}
               />
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="assigned_to">Assigned To</Label>
+            <Select value={form.assigned_to || ""} onValueChange={(v) => handleChange("assigned_to", v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Unassigned" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={null}>Unassigned</SelectItem>
+                {users.map((u) => (
+                  <SelectItem key={u.id} value={u.email}>
+                    {u.full_name || u.email}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">

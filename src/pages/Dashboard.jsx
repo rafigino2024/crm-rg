@@ -2,7 +2,14 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutGrid, List, Zap, Search, Download } from "lucide-react";
+import { Plus, LayoutGrid, List, Zap, Search, Download, UserCircle } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import PipelineBoard from "../components/pipeline/PipelineBoard";
 import StageChart from "../components/pipeline/StageChart";
@@ -16,6 +23,7 @@ export default function Dashboard() {
   const [view, setView] = useState("board");
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingLead, setEditingLead] = useState(null);
@@ -133,8 +141,12 @@ export default function Dashboard() {
     const matchesTags =
       selectedTags.length === 0 ||
       selectedTags.every((t) => l.tags?.includes(t));
-    return matchesSearch && matchesTags;
+    const matchesOwner =
+      !selectedOwner || l.assigned_to === selectedOwner;
+    return matchesSearch && matchesTags && matchesOwner;
   });
+
+  const owners = [...new Set(leads.map((l) => l.assigned_to).filter(Boolean))];
 
   const totalLeads = leads.length;
   const activeLeads = leads.filter(
@@ -219,8 +231,24 @@ export default function Dashboard() {
         </div>
 
         {!isLoading && leads.length > 0 && (
-          <div className="mt-4">
+          <div className="mt-4 flex flex-wrap items-center gap-3">
             <TagFilter leads={leads} selectedTags={selectedTags} onChange={setSelectedTags} />
+            {owners.length > 0 && (
+              <div className="flex items-center gap-1.5">
+                <UserCircle className="w-4 h-4 text-muted-foreground" />
+                <Select value={selectedOwner} onValueChange={setSelectedOwner}>
+                  <SelectTrigger className="h-7 text-xs w-40 rounded-lg">
+                    <SelectValue placeholder="All owners" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>All owners</SelectItem>
+                    {owners.map((o) => (
+                      <SelectItem key={o} value={o}>{o}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
         )}
 

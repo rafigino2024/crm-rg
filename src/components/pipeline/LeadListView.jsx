@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Building2, Mail, Phone } from "lucide-react";
+import { Building2, Mail, Phone, UserCircle } from "lucide-react";
 
 const stageColors = {
   New: "bg-blue-50 text-blue-700 border-blue-200",
@@ -37,13 +37,14 @@ export default function LeadListView({ leads, onLeadClick, selectedIds, onSelect
             <TableHead className="font-semibold">Company</TableHead>
             <TableHead className="font-semibold">Contact</TableHead>
             <TableHead className="font-semibold">Stage</TableHead>
+            <TableHead className="font-semibold">Assigned To</TableHead>
             <TableHead className="font-semibold">Notes</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {leads.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+              <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
                 No leads yet. Add your first lead to get started.
               </TableCell>
             </TableRow>
@@ -85,6 +86,16 @@ export default function LeadListView({ leads, onLeadClick, selectedIds, onSelect
                 <Badge variant="outline" className={`text-xs ${stageColors[lead.stage] || ""}`}>
                   {lead.stage}
                 </Badge>
+              </TableCell>
+              <TableCell onClick={() => onLeadClick(lead)}>
+                {lead.assigned_to ? (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <UserCircle className="w-3.5 h-3.5" />
+                    <span className="truncate max-w-[140px]">{lead.assigned_to}</span>
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground/50">—</span>
+                )}
               </TableCell>
               <TableCell onClick={() => onLeadClick(lead)}>
                 <span className="text-sm text-muted-foreground line-clamp-1 max-w-[200px]">

@@ -1,4 +1,4 @@
-import { Building2, Mail, Phone } from "lucide-react";
+import { Building2, Mail, Phone, UserCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getTagColor } from "./tagConfig";
@@ -66,6 +66,13 @@ export default function LeadCard({ lead, onClick, dragHandleProps, selected, onS
               {tag}
             </span>
           ))}
+        </div>
+      )}
+
+      {lead.assigned_to && (
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1.5">
+          <UserCircle className="w-3 h-3 shrink-0" />
+          <span className="truncate">{lead.assigned_to}</span>
         </div>
       )}
 
