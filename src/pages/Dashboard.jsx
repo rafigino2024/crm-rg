@@ -8,6 +8,7 @@ import PipelineBoard from "../components/pipeline/PipelineBoard";
 import StageChart from "../components/pipeline/StageChart";
 import LeadListView from "../components/pipeline/LeadListView";
 import LeadFormDialog from "../components/pipeline/LeadFormDialog";
+import FollowUpToday from "../components/pipeline/FollowUpToday";
 
 export default function Dashboard() {
   const [view, setView] = useState("board");
@@ -141,6 +142,7 @@ export default function Dashboard() {
       {/* Content */}
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {!isLoading && <StageChart leads={leads} />}
+        {!isLoading && <div className="mt-4"><FollowUpToday leads={leads} onLeadClick={handleLeadClick} /></div>}
 
         {/* Mobile search */}
         <div className="sm:hidden mt-4 relative">

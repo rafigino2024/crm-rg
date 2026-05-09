@@ -28,6 +28,7 @@ const emptyLead = {
   phone: "",
   stage: "New",
   tags: [],
+  follow_up_date: "",
   notes: "",
 };
 
@@ -126,6 +127,17 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                 onChange={(e) => handleChange("phone", e.target.value)}
               />
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="follow_up_date">Follow-up Date</Label>
+            <Input
+              id="follow_up_date"
+              type="date"
+              value={form.follow_up_date || ""}
+              onChange={(e) => handleChange("follow_up_date", e.target.value)}
+              className="h-9"
+            />
           </div>
 
           <div className="space-y-1.5">
