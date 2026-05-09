@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { Button } from "@/components/ui/button";
 import { Plus, LayoutGrid, List, Zap, Search, Download, UserCircle, Mail, Activity, ArrowUpDown } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -44,7 +45,18 @@ export default function Dashboard() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Lead.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["leads"] }),
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ["leads"] });
+      const previous = queryClient.getQueryData(["leads"]);
+      queryClient.setQueryData(["leads"], (old) =>
+        old?.map((l) => (l.id === id ? { ...l, ...data } : l)) ?? old
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(["leads"], ctx.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["leads"] }),
   });
 
   const deleteMutation = useMutation({
@@ -155,6 +167,12 @@ export default function Dashboard() {
     );
   }
 
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ["leads"] });
+  }, [queryClient]);
+
+  const { pulling, pullDistance, threshold } = usePullToRefresh(handleRefresh);
+
   const owners = [...new Set(leads.map((l) => l.assigned_to).filter(Boolean))];
 
   const totalLeads = leads.length;
@@ -163,7 +181,19 @@ export default function Dashboard() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 sm:pb-0">
+      {/* Pull-to-refresh indicator */}
+      {pulling && (
+        <div
+          className="fixed top-0 left-0 right-0 flex items-center justify-center z-50 pointer-events-none transition-all"
+          style={{ height: pullDistance }}
+        >
+          <div
+            className="w-8 h-8 rounded-full border-4 border-primary/30 border-t-primary animate-spin"
+            style={{ opacity: Math.min(pullDistance / threshold, 1) }}
+          />
+        </div>
+      )}
       {/* Header */}
       <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
