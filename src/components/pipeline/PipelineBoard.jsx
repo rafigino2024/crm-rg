@@ -13,7 +13,7 @@ const stageAccents = {
   Lost: "bg-red-400",
 };
 
-export default function PipelineBoard({ leads, onDragEnd, onLeadClick }) {
+export default function PipelineBoard({ leads, onDragEnd, onLeadClick, selectedIds, onSelect }) {
   const grouped = {};
   STAGES.forEach((s) => (grouped[s] = []));
   leads.forEach((lead) => {
@@ -59,6 +59,8 @@ export default function PipelineBoard({ leads, onDragEnd, onLeadClick }) {
                             lead={lead}
                             onClick={onLeadClick}
                             dragHandleProps={provided.dragHandleProps}
+                            selected={selectedIds?.has(lead.id)}
+                            onSelect={onSelect}
                           />
                         </div>
                       )}

@@ -10,11 +10,13 @@ import LeadListView from "../components/pipeline/LeadListView";
 import LeadFormDialog from "../components/pipeline/LeadFormDialog";
 import FollowUpToday from "../components/pipeline/FollowUpToday";
 import TagFilter from "../components/pipeline/TagFilter";
+import BulkActionsBar from "../components/pipeline/BulkActionsBar";
 
 export default function Dashboard() {
   const [view, setView] = useState("board");
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedIds, setSelectedIds] = useState(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingLead, setEditingLead] = useState(null);
   const queryClient = useQueryClient();
@@ -64,6 +66,34 @@ export default function Dashboard() {
   const handleLeadClick = (lead) => {
     setEditingLead(lead);
     setDialogOpen(true);
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = (ids) => {
+    const allSelected = ids.every((id) => selectedIds.has(id));
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(ids));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    await Promise.all([...selectedIds].map((id) => deleteMutation.mutateAsync(id)));
+    setSelectedIds(new Set());
+  };
+
+  const handleBulkChangeStage = async (stage) => {
+    const toUpdate = leads.filter((l) => selectedIds.has(l.id));
+    await Promise.all(toUpdate.map((l) => updateMutation.mutateAsync({ id: l.id, data: { ...l, stage } })));
+    setSelectedIds(new Set());
   };
 
   const openAddDialog = () => {
@@ -204,12 +234,29 @@ export default function Dashboard() {
             leads={filteredLeads}
             onDragEnd={handleDragEnd}
             onLeadClick={handleLeadClick}
+            selectedIds={selectedIds}
+            onSelect={toggleSelect}
           />
         ) : (
-          <LeadListView leads={filteredLeads} onLeadClick={handleLeadClick} />
+          <LeadListView
+            leads={filteredLeads}
+            onLeadClick={handleLeadClick}
+            selectedIds={selectedIds}
+            onSelect={toggleSelect}
+            onSelectAll={toggleSelectAll}
+          />
         )}
         </div>
       </main>
+
+      {selectedIds.size > 0 && (
+        <BulkActionsBar
+          selectedCount={selectedIds.size}
+          onChangeStage={handleBulkChangeStage}
+          onDelete={handleBulkDelete}
+          onClear={() => setSelectedIds(new Set())}
+        />
+      )}
 
       {/* Form Dialog */}
       <LeadFormDialog

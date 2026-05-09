@@ -1,5 +1,6 @@
 import { Building2, Mail, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { getTagColor } from "./tagConfig";
 
 const stageColors = {
@@ -11,18 +12,24 @@ const stageColors = {
   Lost: "bg-red-50 text-red-700 border-red-200",
 };
 
-export default function LeadCard({ lead, onClick, dragHandleProps }) {
+export default function LeadCard({ lead, onClick, dragHandleProps, selected, onSelect }) {
   return (
     <div
       onClick={() => onClick?.(lead)}
-      className="group bg-card rounded-xl border border-border/60 p-4 cursor-pointer
-                 hover:shadow-md hover:border-primary/20 transition-all duration-200"
+      className={`group bg-card rounded-xl border p-4 cursor-pointer
+                 hover:shadow-md hover:border-primary/20 transition-all duration-200
+                 ${selected ? "border-primary/50 bg-primary/5" : "border-border/60"}`}
       {...dragHandleProps}
     >
       <div className="flex items-start justify-between mb-2">
-        <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">
-          {lead.name}
-        </h3>
+        <div className="flex items-center gap-2 min-w-0">
+          <div onClick={(e) => { e.stopPropagation(); onSelect?.(lead.id); }} className="shrink-0">
+            <Checkbox checked={selected} className="data-[state=checked]:bg-primary" />
+          </div>
+          <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">
+            {lead.name}
+          </h3>
+        </div>
         <Badge variant="outline" className={`text-[10px] px-1.5 py-0 shrink-0 ml-2 ${stageColors[lead.stage] || ""}`}>
           {lead.stage}
         </Badge>
