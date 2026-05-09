@@ -2,7 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutGrid, List, Zap, Search } from "lucide-react";
+import { Plus, LayoutGrid, List, Zap, Search, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import PipelineBoard from "../components/pipeline/PipelineBoard";
 import StageChart from "../components/pipeline/StageChart";
@@ -71,6 +71,30 @@ export default function Dashboard() {
     setDialogOpen(true);
   };
 
+  const exportCSV = () => {
+    const headers = ["Name", "Company", "Email", "Phone", "Stage", "Tags", "Follow-up Date", "Notes"];
+    const rows = filteredLeads.map((l) => [
+      l.name || "",
+      l.company || "",
+      l.email || "",
+      l.phone || "",
+      l.stage || "",
+      (l.tags || []).join("; "),
+      l.follow_up_date || "",
+      (l.notes || "").replace(/\n/g, " "),
+    ]);
+    const csv = [headers, ...rows]
+      .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "leads.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const filteredLeads = leads.filter((l) => {
     const matchesSearch =
       !search.trim() ||
@@ -135,6 +159,10 @@ export default function Dashboard() {
                 </button>
               </div>
 
+              <Button onClick={exportCSV} size="sm" variant="outline" className="gap-1.5 rounded-lg">
+                <Download className="w-4 h-4" />
+                <span className="hidden sm:inline">Export CSV</span>
+              </Button>
               <Button onClick={openAddDialog} size="sm" className="gap-1.5 rounded-lg">
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Add Lead</span>
