@@ -32,6 +32,19 @@
       "default": "New",
       "description": "Current pipeline stage"
     },
+    "loss_reason": {
+      "type": "string",
+      "enum": [
+        "Price",
+        "Timeline",
+        "Competitor",
+        "No Budget",
+        "No Need",
+        "No Response",
+        "Other"
+      ],
+      "description": "Reason why the deal was lost"
+    },
     "priority": {
       "type": "string",
       "enum": [

@@ -25,6 +25,7 @@ import ActivityHistory from "./ActivityHistory";
 import { Separator } from "@/components/ui/separator";
 
 const STAGES = ["New", "Contacted", "Qualified", "Negotiation", "Proposal", "Won", "Lost"];
+const LOSS_REASONS = ["Price", "Timeline", "Competitor", "No Budget", "No Need", "No Response", "Other"];
 
 const emptyLead = {
   name: "",
@@ -38,6 +39,7 @@ const emptyLead = {
   tags: [],
   follow_up_date: "",
   next_action_date: "",
+  loss_reason: "",
   notes: "",
   internal_notes: "",
 };
@@ -65,6 +67,7 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) return;
+    if (form.stage === "Lost" && !form.loss_reason) return;
     setSaving(true);
     await onSave(form);
     setSaving(false);
@@ -125,6 +128,27 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                 </MobileSelect>
               </div>
             </div>
+
+            {form.stage === "Lost" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="loss_reason">Reason for Loss *</Label>
+                <MobileSelect
+                  value={form.loss_reason || ""}
+                  onValueChange={(v) => handleChange("loss_reason", v)}
+                  placeholder="Select reason..."
+                  label="Reason for Loss"
+                >
+                  <SelectContent>
+                    {LOSS_REASONS.map((r) => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </MobileSelect>
+                {!form.loss_reason && (
+                  <p className="text-xs text-destructive">Required when stage is Lost</p>
+                )}
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <Label htmlFor="priority">Priority</Label>
@@ -272,7 +296,7 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={saving || !form.name.trim()}>
+              <Button type="submit" disabled={saving || !form.name.trim() || (form.stage === "Lost" && !form.loss_reason)}>
                 {saving ? "Saving..." : lead ? "Save Changes" : "Add Lead"}
               </Button>
             </DialogFooter>
