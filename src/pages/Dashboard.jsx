@@ -21,6 +21,7 @@ import FollowUpToday from "../components/pipeline/FollowUpToday";
 import TagFilter from "../components/pipeline/TagFilter";
 import BulkActionsBar from "../components/pipeline/BulkActionsBar";
 import PipelineValueSummary from "../components/pipeline/PipelineValueSummary";
+import ConversionSummaryCard from "../components/pipeline/ConversionSummaryCard";
 import BulkImportCSV from "../components/pipeline/BulkImportCSV";
 import DashboardMobileMenu from "../components/DashboardMobileMenu";
 import CalendarView from "../components/pipeline/CalendarView";
@@ -297,7 +298,12 @@ export default function Dashboard() {
 
       {/* Content */}
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {!isLoading && <PipelineValueSummary leads={leads} />}
+        {!isLoading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <PipelineValueSummary leads={leads} />
+            <ConversionSummaryCard leads={leads} />
+          </div>
+        )}
         {!isLoading && <StageChart leads={leads} />}
         {!isLoading && <div className="mt-4"><CalendarView leads={leads} onLeadClick={handleLeadClick} /></div>}
         {!isLoading && <div className="mt-4"><FollowUpToday leads={leads} onLeadClick={handleLeadClick} /></div>}
