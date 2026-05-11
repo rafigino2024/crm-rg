@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Badge } from "@/components/ui/badge";
-import { Circle, Loader, ChevronRight } from "lucide-react";
+import { Circle, Loader, ChevronRight, AlertCircle } from "lucide-react";
+import { isAfter, parseISO, startOfDay } from "date-fns";
 
 const STATUS_CONFIG = {
   "To Do":       { color: "bg-slate-100 text-slate-600 border-slate-200", icon: Circle },
@@ -36,6 +37,11 @@ export default function PendingTasksWidget({ leads, onLeadClick }) {
 
   const getLeadForTask = (task) => leads.find((l) => l.id === task.lead_id);
 
+  const isOverdue = (task) =>
+    task.due_date && isAfter(startOfDay(new Date()), parseISO(task.due_date));
+
+  const overdueCount = tasks.filter(isOverdue).length;
+
   if (loading) return null;
   if (tasks.length === 0) return null;
 
@@ -47,6 +53,12 @@ export default function PendingTasksWidget({ leads, onLeadClick }) {
           <span className="text-xs bg-primary/10 text-primary font-medium px-2 py-0.5 rounded-full">
             {tasks.length}
           </span>
+          {overdueCount > 0 && (
+            <span className="flex items-center gap-1 text-xs bg-red-500 text-white font-semibold px-2 py-0.5 rounded-full">
+              <AlertCircle className="w-3 h-3" />
+              {overdueCount} overdue
+            </span>
+          )}
         </div>
       </div>
 
@@ -54,10 +66,11 @@ export default function PendingTasksWidget({ leads, onLeadClick }) {
         {tasks.map((task) => {
           const lead = getLeadForTask(task);
           const { color, icon: Icon } = STATUS_CONFIG[task.status] || STATUS_CONFIG["To Do"];
+          const overdue = isOverdue(task);
           return (
             <div
               key={task.id}
-              className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40 transition-colors cursor-pointer group"
+              className={`flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40 transition-colors cursor-pointer group ${overdue ? "bg-red-50/50 dark:bg-red-950/20" : ""}`}
               onClick={() => lead && onLeadClick(lead)}
             >
               <button
@@ -73,6 +86,16 @@ export default function PendingTasksWidget({ leads, onLeadClick }) {
               </button>
 
               <span className="flex-1 text-sm text-foreground truncate">{task.title}</span>
+
+              {overdue && (
+                <span className="text-xs font-semibold text-red-500 shrink-0">Overdue</span>
+              )}
+
+              {task.due_date && !overdue && (
+                <span className="text-xs text-muted-foreground shrink-0">
+                  Due {task.due_date}
+                </span>
+              )}
 
               {lead && (
                 <span className="text-xs text-muted-foreground truncate max-w-[120px]">
