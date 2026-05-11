@@ -22,6 +22,7 @@ import TagEditor from "./TagEditor";
 import { base44 } from "@/api/base44Client";
 import SendEmailDialog from "./SendEmailDialog";
 import ActivityHistory from "./ActivityHistory";
+import TaskList from "./TaskList";
 import { Separator } from "@/components/ui/separator";
 
 const STAGES = ["New", "Contacted", "Qualified", "Negotiation", "Proposal", "Won", "Lost"];
@@ -272,6 +273,14 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                 onChange={(e) => handleChange("internal_notes", e.target.value)}
               />
             </div>
+
+          {lead && (
+            <div className="space-y-1.5">
+              <Separator />
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide pt-1">Tasks</p>
+              <TaskList leadId={lead.id} />
+            </div>
+          )}
 
           {lead && (
             <div className="space-y-1.5">

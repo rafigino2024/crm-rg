@@ -1,0 +1,37 @@
+{
+  "name": "Task",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "description": "ID of the lead this task belongs to"
+    },
+    "title": {
+      "type": "string",
+      "description": "Task title, e.g. Call back, Send quote, Meeting"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "To Do",
+        "In Progress",
+        "Done"
+      ],
+      "default": "To Do",
+      "description": "Current status of the task"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Optional due date for the task"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional notes about the task"
+    }
+  },
+  "required": [
+    "lead_id",
+    "title"
+  ]
+}
