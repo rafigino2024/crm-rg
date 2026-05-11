@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,7 @@ function applyPlaceholders(text, lead) {
     .replace(/\{\{company\}\}/g, lead.company || "");
 }
 
-export default function SendEmailDialog({ open, onOpenChange, lead }) {
+export default function SendEmailDialog({ open, onOpenChange, lead, defaultStage }) {
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -40,6 +40,13 @@ export default function SendEmailDialog({ open, onOpenChange, lead }) {
     queryFn: () => base44.entities.EmailTemplate.list("-created_date"),
     enabled: open,
   });
+
+  // Auto-load a matching template when opened from a stage change
+  useEffect(() => {
+    if (!open || !defaultStage || templates.length === 0) return;
+    const match = templates.find((t) => t.stage === defaultStage) || templates.find((t) => t.stage === "Any");
+    if (match) handleTemplateChange(match.id);
+  }, [open, defaultStage, templates]);
 
   const handleTemplateChange = (id) => {
     setSelectedTemplateId(id);
@@ -119,6 +126,11 @@ export default function SendEmailDialog({ open, onOpenChange, lead }) {
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Send Email to {lead?.name}</DialogTitle>
+          {defaultStage && (
+            <p className="text-sm text-muted-foreground">
+              Stage moved to <span className="font-medium text-foreground">{defaultStage}</span> — a matching template has been pre-loaded.
+            </p>
+          )}
         </DialogHeader>
         <div className="space-y-4 pt-2">
           {templates.length > 0 && (

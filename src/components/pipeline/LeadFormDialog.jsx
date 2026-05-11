@@ -50,6 +50,7 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
   const [saving, setSaving] = useState(false);
   const [users, setUsers] = useState([]);
   const [emailOpen, setEmailOpen] = useState(false);
+  const [stageDraftStage, setStageDraftStage] = useState(null);
 
   useEffect(() => {
     base44.entities.User.list().then(setUsers).catch(() => {});
@@ -70,9 +71,14 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
     if (!form.name.trim()) return;
     if (form.stage === "Lost" && !form.loss_reason) return;
     setSaving(true);
+    const stageChanged = lead && form.stage !== lead.stage;
     await onSave(form);
     setSaving(false);
     onOpenChange(false);
+    if (stageChanged && form.email) {
+      setStageDraftStage(form.stage);
+      setEmailOpen(true);
+    }
   };
 
   const handleDelete = async () => {
@@ -313,8 +319,13 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
         </DialogContent>
       </Dialog>
 
-      {lead && (
-        <SendEmailDialog open={emailOpen} onOpenChange={setEmailOpen} lead={lead} />
+      {(lead || stageDraftStage) && (
+        <SendEmailDialog
+          open={emailOpen}
+          onOpenChange={(v) => { setEmailOpen(v); if (!v) setStageDraftStage(null); }}
+          lead={{ ...lead, ...form }}
+          defaultStage={stageDraftStage}
+        />
       )}
     </>
   );
