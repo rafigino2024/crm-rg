@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [sortByPriority, setSortByPriority] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedOwner, setSelectedOwner] = useState("");
+  const [selectedPriority, setSelectedPriority] = useState("");
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
@@ -164,7 +165,9 @@ export default function Dashboard() {
       selectedTags.every((t) => l.tags?.includes(t));
     const matchesOwner =
       !selectedOwner || l.assigned_to === selectedOwner;
-    return matchesSearch && matchesTags && matchesOwner;
+    const matchesPriority =
+      !selectedPriority || l.priority === selectedPriority;
+    return matchesSearch && matchesTags && matchesOwner && matchesPriority;
   });
 
   if (sortByPriority) {
@@ -321,6 +324,24 @@ export default function Dashboard() {
 
         {!isLoading && leads.length > 0 && (
           <div className="mt-4 flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              {["High", "Medium", "Low"].map((p) => {
+                const colors = {
+                  High: selectedPriority === "High" ? "bg-red-500 text-white border-red-500" : "border-red-200 text-red-600 hover:bg-red-50",
+                  Medium: selectedPriority === "Medium" ? "bg-amber-500 text-white border-amber-500" : "border-amber-200 text-amber-600 hover:bg-amber-50",
+                  Low: selectedPriority === "Low" ? "bg-slate-400 text-white border-slate-400" : "border-slate-200 text-slate-500 hover:bg-slate-50",
+                };
+                return (
+                  <button
+                    key={p}
+                    onClick={() => setSelectedPriority(selectedPriority === p ? "" : p)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${colors[p]}`}
+                  >
+                    {p}
+                  </button>
+                );
+              })}
+            </div>
             <TagFilter leads={leads} selectedTags={selectedTags} onChange={setSelectedTags} />
             {owners.length > 0 && (
               <div className="flex items-center gap-1.5">
