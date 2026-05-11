@@ -25,6 +25,7 @@ import ConversionSummaryCard from "../components/pipeline/ConversionSummaryCard"
 import BulkImportCSV from "../components/pipeline/BulkImportCSV";
 import DashboardMobileMenu from "../components/DashboardMobileMenu";
 import CalendarView from "../components/pipeline/CalendarView";
+import PendingTasksWidget from "../components/pipeline/PendingTasksWidget";
 
 export default function Dashboard() {
   const PRIORITY_ORDER = { High: 0, Medium: 1, Low: 2 };
@@ -310,6 +311,7 @@ export default function Dashboard() {
         {!isLoading && <StageChart leads={leads} />}
         {!isLoading && <div className="mt-4"><CalendarView leads={leads} onLeadClick={handleLeadClick} /></div>}
         {!isLoading && <div className="mt-4"><FollowUpToday leads={leads} onLeadClick={handleLeadClick} /></div>}
+        {!isLoading && <PendingTasksWidget leads={leads} onLeadClick={handleLeadClick} />}
 
         {/* Mobile search */}
         <div className="sm:hidden mt-4 relative">
