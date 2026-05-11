@@ -45,6 +45,20 @@
       ],
       "description": "Reason why the deal was lost"
     },
+    "lead_source": {
+      "type": "string",
+      "enum": [
+        "Website",
+        "Referral",
+        "Social Media",
+        "Cold Outreach",
+        "Event",
+        "Paid Ads",
+        "Partner",
+        "Other"
+      ],
+      "description": "Where the lead originated from"
+    },
     "priority": {
       "type": "string",
       "enum": [

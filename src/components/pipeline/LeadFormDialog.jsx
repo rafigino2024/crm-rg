@@ -27,6 +27,7 @@ import { Separator } from "@/components/ui/separator";
 
 const STAGES = ["New", "Contacted", "Qualified", "Negotiation", "Proposal", "Won", "Lost"];
 const LOSS_REASONS = ["Price", "Timeline", "Competitor", "No Budget", "No Need", "No Response", "Other"];
+const LEAD_SOURCES = ["Website", "Referral", "Social Media", "Cold Outreach", "Event", "Paid Ads", "Partner", "Other"];
 
 const emptyLead = {
   name: "",
@@ -41,6 +42,7 @@ const emptyLead = {
   follow_up_date: "",
   next_action_date: "",
   loss_reason: "",
+  lead_source: "",
   notes: "",
   internal_notes: "",
 };
@@ -193,6 +195,22 @@ export default function LeadFormDialog({ open, onOpenChange, lead, onSave, onDel
                   onChange={(e) => handleChange("phone", e.target.value)}
                 />
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Lead Source</Label>
+              <MobileSelect
+                value={form.lead_source || ""}
+                onValueChange={(v) => handleChange("lead_source", v)}
+                placeholder="Select source..."
+                label="Lead Source"
+              >
+                <SelectContent>
+                  {LEAD_SOURCES.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </MobileSelect>
             </div>
 
             <div className="space-y-1.5">
