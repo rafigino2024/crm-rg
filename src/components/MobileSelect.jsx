@@ -36,8 +36,12 @@ export default function MobileSelect({
     );
   }
 
-  // Extract the selected item text from children for display
-  const selectedText = children.props?.children?.find(
+  // Normalize children of SelectContent to always be an array
+  const rawItems = children.props?.children;
+  const items = rawItems ? (Array.isArray(rawItems) ? rawItems : [rawItems]) : [];
+
+  // Extract the selected item text for display
+  const selectedText = items.find(
     (child) => child?.props?.value === value
   )?.props?.children || placeholder;
 
@@ -47,7 +51,7 @@ export default function MobileSelect({
         onClick={() => setDrawerOpen(true)}
         className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm hover:bg-accent transition-colors"
       >
-        <span className="text-muted-foreground">{selectedText}</span>
+        <span className={value ? "text-foreground" : "text-muted-foreground"}>{selectedText}</span>
         <svg
           className="w-4 h-4 opacity-50"
           xmlns="http://www.w3.org/2000/svg"
@@ -66,17 +70,17 @@ export default function MobileSelect({
             <DrawerTitle>{label}</DrawerTitle>
           </DrawerHeader>
           <div className="space-y-2 p-4 pb-6">
-            {children.props?.children?.map((item) => (
+            {items.filter(Boolean).map((item) => (
               <Button
-                key={item.props.value}
-                variant={value === item.props.value ? "default" : "outline"}
+                key={item.props?.value}
+                variant={value === item.props?.value ? "default" : "outline"}
                 className="w-full justify-start"
                 onClick={() => {
-                  onValueChange(item.props.value);
+                  onValueChange(item.props?.value);
                   setDrawerOpen(false);
                 }}
               >
-                {item.props.children}
+                {item.props?.children}
               </Button>
             ))}
           </div>
