@@ -33,6 +33,12 @@ test("service: stage change is logged as activity", () => {
   const acts = crm.listActivities(lead.id);
   assert.equal(acts[0].type, "stage_changed");
   assert.equal(acts[0].actor, "ai");
+  assert.equal(acts[0].old_value, "New");
+  assert.equal(acts[0].new_value, "Contacted");
+});
+
+test("service: add_note on missing lead fails cleanly", () => {
+  assert.throws(() => crm.logActivity(987654, "note", "x"), /not found/);
 });
 
 test("rest: auth required", async () => {

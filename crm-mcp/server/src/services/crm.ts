@@ -72,7 +72,7 @@ export class CrmService {
                  VALUES (${columns.map((c) => ":" + c).join(", ")})`;
     const { lastInsertRowid } = this.db.prepare(sql).run(params);
     const lead = this.getLead(Number(lastInsertRowid));
-    this.logActivity(lead.id, "lead_created", `Lead "${lead.name}" created`, actor);
+    this.logActivity(lead.id, "lead_created", `Lead "${lead.name}" created`, actor, null, lead.name);
     return lead;
   }
 
@@ -86,13 +86,13 @@ export class CrmService {
     const after = this.getLead(id);
 
     if (before.stage !== after.stage) {
-      this.logActivity(id, "stage_changed", `Stage changed: ${before.stage} → ${after.stage}`, actor);
+      this.logActivity(id, "stage_changed", `Stage changed: ${before.stage} → ${after.stage}`, actor, before.stage, after.stage);
     }
     const otherChanged = columns.filter(
       (c) => c !== "stage" && before[c as keyof Lead] !== after[c as keyof Lead],
     );
     if (otherChanged.length) {
-      this.logActivity(id, "field_updated", `Updated: ${otherChanged.join(", ")}`, actor);
+      this.logActivity(id, "field_updated", `Updated: ${otherChanged.join(", ")}`, actor, null, otherChanged.join(","));
     }
     return after;
   }
@@ -138,7 +138,7 @@ export class CrmService {
     const { lastInsertRowid } = this.db.prepare(sql).run(params);
     const task = this.getTask(Number(lastInsertRowid));
     if (task.lead_id) {
-      this.logActivity(task.lead_id, "task_created", `Task added: ${task.title}`, actor);
+      this.logActivity(task.lead_id, "task_created", `Task added: ${task.title}`, actor, null, task.title);
     }
     return task;
   }
@@ -152,7 +152,7 @@ export class CrmService {
     this.db.prepare(sql).run({ ...params, id });
     const after = this.getTask(id);
     if (after.lead_id && before.status !== after.status && after.status === "Done") {
-      this.logActivity(after.lead_id, "task_completed", `Task completed: ${after.title}`, actor);
+      this.logActivity(after.lead_id, "task_completed", `Task completed: ${after.title}`, actor, null, after.title);
     }
     return after;
   }
@@ -164,10 +164,20 @@ export class CrmService {
 
   // ---------- Activity ----------
 
-  logActivity(leadId: number, type: string, description: string, actor: Actor = "user"): Activity {
+  logActivity(
+    leadId: number,
+    type: string,
+    description: string,
+    actor: Actor = "user",
+    oldValue: string | null = null,
+    newValue: string | null = null,
+  ): Activity {
+    this.getLead(leadId);
     const { lastInsertRowid } = this.db
-      .prepare("INSERT INTO activities (lead_id, type, description, actor) VALUES (?, ?, ?, ?)")
-      .run(leadId, type, description, actor);
+      .prepare(
+        "INSERT INTO activities (lead_id, type, description, actor, old_value, new_value) VALUES (?, ?, ?, ?, ?, ?)",
+      )
+      .run(leadId, type, description, actor, oldValue, newValue);
     return this.db
       .prepare("SELECT * FROM activities WHERE id = ?")
       .get(Number(lastInsertRowid)) as unknown as Activity;

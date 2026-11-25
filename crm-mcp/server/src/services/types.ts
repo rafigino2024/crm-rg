@@ -73,6 +73,8 @@ export interface Activity {
   lead_id: number;
   type: string;
   description: string;
+  old_value: string | null;
+  new_value: string | null;
   actor: string;
   created_at: string;
 }

@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS activities (
   lead_id     INTEGER NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
   type        TEXT NOT NULL,
   description TEXT NOT NULL,
+  old_value   TEXT,
+  new_value   TEXT,
   actor       TEXT NOT NULL DEFAULT 'user',
   created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
 );
@@ -53,5 +55,14 @@ export function openDatabase(path: string): DB {
   const db = new DatabaseSync(path);
   db.exec("PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;");
   db.exec(SCHEMA);
+  migrate(db);
   return db;
+}
+
+/** Additive migrations for databases created by older versions. */
+function migrate(db: DB) {
+  const cols = (db.prepare("PRAGMA table_info(activities)").all() as { name: string }[]).map((c) => c.name);
+  for (const col of ["old_value", "new_value"]) {
+    if (!cols.includes(col)) db.exec(`ALTER TABLE activities ADD COLUMN ${col} TEXT`);
+  }
 }
