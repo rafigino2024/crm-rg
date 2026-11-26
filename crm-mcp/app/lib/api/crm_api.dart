@@ -35,9 +35,11 @@ class CrmApi {
 
   dynamic _decode(http.Response r) {
     if (r.statusCode >= 400) {
-      String msg = r.body;
+      // Decode as UTF-8 explicitly: Hebrew error messages must survive a missing charset.
+      final text = utf8.decode(r.bodyBytes, allowMalformed: true);
+      String msg = text;
       try {
-        msg = (jsonDecode(r.body) as Map)['error']?.toString() ?? r.body;
+        msg = (jsonDecode(text) as Map)['error']?.toString() ?? text;
       } catch (_) {}
       throw ApiException(r.statusCode, msg);
     }
@@ -73,6 +75,11 @@ class CrmApi {
   Future<CrmTask> setTaskDone(int id, bool done) async =>
       CrmTask.fromJson(await _send('PATCH', '/tasks/$id', {'status': done ? 'Done' : 'Open'}));
   Future<void> deleteTask(int id) => _send('DELETE', '/tasks/$id');
+
+  // AI assistant
+  Future<ChatReply> chat(List<ChatMessage> conversation) async => ChatReply.fromJson(
+    await _send('POST', '/chat', {'messages': conversation.where((m) => !m.isError).map((m) => m.toJson()).toList()}),
+  );
 
   // Dashboard
   Future<PipelineSummary> summary() async => PipelineSummary.fromJson(await _get('/summary'));

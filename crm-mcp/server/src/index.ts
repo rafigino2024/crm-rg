@@ -9,4 +9,5 @@ createApp(crm, { apiToken: config.apiToken }).listen(config.port, config.host, (
   console.log(`  REST API : /api   (Flutter app)`);
   console.log(`  MCP      : /mcp   (AI agents, Streamable HTTP)`);
   if (!config.apiToken) console.log("  ⚠ API_TOKEN not set - no auth");
+  if (!process.env.ANTHROPIC_API_KEY) console.log("  ⚠ ANTHROPIC_API_KEY not set - AI chat (/api/chat) disabled");
 });

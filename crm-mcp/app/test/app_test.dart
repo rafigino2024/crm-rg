@@ -65,6 +65,19 @@ MockClient fakeServer(List<http.Request> log) => MockClient((req) async {
     body = _leads.where((l) => stage == null || l['stage'] == stage).toList();
   } else if (path == '/api/leads' && req.method == 'POST') {
     body = {..._leads[1], 'id': 3, ...jsonDecode(req.body) as Map};
+  } else if (path == '/api/chat') {
+    final msgs = (jsonDecode(req.body) as Map)['messages'] as List;
+    if ((msgs.last as Map)['content'] == 'fail') {
+      return http.Response.bytes(utf8.encode('{"error":"עוזר ה-AI לא מוגדר בשרת"}'), 503);
+    }
+    body = {
+      'reply': 'העברתי את Maya Green לשלב נסגר.',
+      'actions': [
+        {'tool': 'search_leads', 'input': {}, 'is_error': false},
+        {'tool': 'update_lead', 'input': {}, 'is_error': false},
+      ],
+      'changed_data': true,
+    };
   } else if (path == '/api/tasks') {
     body = [];
   } else {
@@ -157,5 +170,38 @@ void main() {
     final post = log.where((r) => r.method == 'POST').single;
     expect(jsonDecode(post.body)['name'], 'ליד בדיקה');
     expect(find.text('ליד חדש'), findsOneWidget); // back on the list (FAB label)
+  });
+
+  testWidgets('chat: sends conversation, shows reply and actions, refreshes data', (tester) async {
+    final log = <http.Request>[];
+    await tester.pumpWidget(appWith(fakeServer(log)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('עוזר AI').last);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField).last, 'תסגור את מאיה');
+    await tester.tap(find.byTooltip('שליחה'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('תסגור את מאיה'), findsOneWidget);
+    expect(find.text('העברתי את Maya Green לשלב נסגר.'), findsOneWidget);
+    expect(find.text('עדכון ליד'), findsOneWidget);
+
+    final chatReq = log.singleWhere((r) => r.url.path == '/api/chat');
+    expect(jsonDecode(chatReq.body), {
+      'messages': [
+        {'role': 'user', 'content': 'תסגור את מאיה'},
+      ],
+    });
+    // changed_data=true -> the dashboard summary is fetched again
+    expect(log.where((r) => r.url.path == '/api/summary').length, greaterThan(1));
+
+    // Server error shows an error bubble; the next request carries the full text history only.
+    await tester.enterText(find.byType(TextField).last, 'fail');
+    await tester.tap(find.byTooltip('שליחה'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('לא מוגדר'), findsOneWidget);
+    final second = jsonDecode(log.where((r) => r.url.path == '/api/chat').last.body)['messages'] as List;
+    expect(second.map((m) => m['role']), ['user', 'assistant', 'user']);
   });
 }

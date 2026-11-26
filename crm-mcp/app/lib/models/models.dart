@@ -180,3 +180,52 @@ class PipelineSummary {
     followUpsDue: j['follow_ups_due'] as int,
   );
 }
+
+/// One CRM tool call the AI assistant made (returned by POST /api/chat).
+class ChatAction {
+  ChatAction({required this.tool, required this.isError});
+  final String tool;
+  final bool isError;
+
+  factory ChatAction.fromJson(Map<String, dynamic> j) =>
+      ChatAction(tool: j['tool'] as String, isError: j['is_error'] as bool? ?? false);
+
+  /// Hebrew label for the tool, shown under the assistant's reply.
+  String get label => switch (tool) {
+    'search_leads' => 'חיפוש לידים',
+    'get_lead' => 'צפייה בליד',
+    'create_lead' => 'יצירת ליד',
+    'update_lead' => 'עדכון ליד',
+    'add_note' => 'הוספת הערה',
+    'list_tasks' => 'בדיקת משימות',
+    'create_task' => 'יצירת משימה',
+    'complete_task' => 'סגירת משימה',
+    'pipeline_summary' => 'סיכום פייפליין',
+    _ => tool,
+  };
+}
+
+class ChatMessage {
+  ChatMessage({required this.fromUser, required this.text, this.actions = const [], this.isError = false});
+  final bool fromUser;
+  final String text;
+  final List<ChatAction> actions;
+
+  /// A local error bubble (not part of the conversation sent to the server).
+  final bool isError;
+
+  Map<String, dynamic> toJson() => {'role': fromUser ? 'user' : 'assistant', 'content': text};
+}
+
+class ChatReply {
+  ChatReply({required this.reply, required this.actions, required this.changedData});
+  final String reply;
+  final List<ChatAction> actions;
+  final bool changedData;
+
+  factory ChatReply.fromJson(Map<String, dynamic> j) => ChatReply(
+    reply: j['reply'] as String,
+    actions: (j['actions'] as List).map((a) => ChatAction.fromJson(a as Map<String, dynamic>)).toList(),
+    changedData: j['changed_data'] as bool? ?? false,
+  );
+}

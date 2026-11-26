@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'screens/chat_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/leads_screen.dart';
 import 'screens/tasks_screen.dart';
@@ -46,7 +47,7 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
-  static const _pages = [DashboardScreen(), LeadsScreen(), TasksScreen()];
+  static const _pages = [DashboardScreen(), LeadsScreen(), TasksScreen(), ChatScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +67,11 @@ class _HomeShellState extends State<HomeShell> {
             icon: Icon(Icons.task_alt_outlined),
             selectedIcon: Icon(Icons.task_alt),
             label: 'משימות',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.auto_awesome_outlined),
+            selectedIcon: Icon(Icons.auto_awesome),
+            label: 'עוזר AI',
           ),
         ],
       ),

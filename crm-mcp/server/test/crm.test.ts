@@ -62,6 +62,16 @@ test("rest: create, update, validate, 404", async () => {
   assert.equal(res.status, 404);
 });
 
+test("rest: chat validates the conversation", async () => {
+  const res = await api("/chat", { method: "POST", body: JSON.stringify({ messages: [] }) });
+  assert.equal(res.status, 400);
+  const res2 = await api("/chat", {
+    method: "POST",
+    body: JSON.stringify({ messages: [{ role: "assistant", content: "hi" }] }),
+  });
+  assert.equal(res2.status, 400);
+});
+
 test("mcp: list tools and call them end-to-end", async () => {
   const client = new Client({ name: "test", version: "1.0.0" });
   await client.connect(

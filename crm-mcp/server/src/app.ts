@@ -4,6 +4,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { createRestRouter } from "./api/rest.ts";
 import { createMcpServer } from "./mcp/server.ts";
 import type { CrmService } from "./services/crm.ts";
+import { ChatService } from "./ai/chat.ts";
 
 function bearerAuth(token: string): RequestHandler {
   return (req, res, next) => {
@@ -13,7 +14,7 @@ function bearerAuth(token: string): RequestHandler {
 }
 
 /** One Express app serving both the REST API (/api) and the MCP endpoint (/mcp). */
-export function createApp(crm: CrmService, opts: { apiToken?: string } = {}) {
+export function createApp(crm: CrmService, opts: { apiToken?: string; chat?: ChatService } = {}) {
   const app = express();
   app.use(cors({ exposedHeaders: ["Mcp-Session-Id"] }));
   app.use(express.json());
@@ -21,7 +22,7 @@ export function createApp(crm: CrmService, opts: { apiToken?: string } = {}) {
   app.get("/health", (_req, res) => res.json({ ok: true }));
 
   const auth = bearerAuth(opts.apiToken ?? "");
-  app.use("/api", auth, createRestRouter(crm));
+  app.use("/api", auth, createRestRouter(crm, opts.chat ?? new ChatService(crm)));
 
   // Stateless Streamable HTTP: a fresh MCP server + transport per request.
   app.post("/mcp", auth, async (req, res) => {

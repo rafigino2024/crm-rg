@@ -52,3 +52,46 @@ void refreshAll(WidgetRef ref) {
   ref.invalidate(tasksProvider);
   ref.invalidate(summaryProvider);
 }
+
+/// Chat history with the AI assistant (kept while the app is open).
+class ChatState {
+  const ChatState({this.messages = const [], this.sending = false});
+  final List<ChatMessage> messages;
+  final bool sending;
+}
+
+class ChatNotifier extends Notifier<ChatState> {
+  @override
+  ChatState build() => const ChatState();
+
+  /// Sends a message. Returns true if the assistant changed CRM data.
+  Future<bool> send(String text) async {
+    if (state.sending || text.trim().isEmpty) return false;
+    final history = [...state.messages, ChatMessage(fromUser: true, text: text.trim())];
+    state = ChatState(messages: history, sending: true);
+    try {
+      final reply = await ref.read(apiProvider).chat(history);
+      state = ChatState(
+        messages: [
+          ...history,
+          ChatMessage(fromUser: false, text: reply.reply, actions: reply.actions),
+        ],
+      );
+      return reply.changedData;
+    } catch (e) {
+      // The error bubble is local only (not sent to the server). The unanswered user
+      // message stays in history; two user turns in a row are fine for the API.
+      state = ChatState(
+        messages: [
+          ...history,
+          ChatMessage(fromUser: false, text: e is ApiException ? e.message : '$e', isError: true),
+        ],
+      );
+      return false;
+    }
+  }
+
+  void clear() => state = const ChatState();
+}
+
+final chatProvider = NotifierProvider<ChatNotifier, ChatState>(ChatNotifier.new);
